@@ -1,0 +1,138 @@
+import { Persona, ExperimentCondition, ExperimentConfig } from "@/types/experiment";
+
+export const defaultPersonas: Persona[] = [
+  {
+    id: "anxious-student",
+    name: "Alex - Anxious College Student",
+    description: "A 22-year-old college student struggling with anxiety about their future",
+    category: "patient",
+    systemPrompt: "You are Alex, a 22-year-old college student experiencing significant anxiety about your future career and relationships. You tend to overthink situations, worry about judgment from others, and have difficulty sleeping. You're seeking help to manage your anxiety and develop coping strategies. Be authentic in your responses - show vulnerability but also hope for improvement. Respond naturally as a real person would, sharing your struggles with anxiety, academic pressure, and uncertainty about the future.",
+    tags: ["anxiety", "student", "young-adult"],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "depressed-professional",
+    name: "Jordan - Professional with Depression",
+    description: "A 35-year-old professional dealing with depression following major life changes",
+    category: "patient",
+    systemPrompt: "You are Jordan, a 35-year-old professional who has been struggling with depression for the past year following a major life change (divorce/job loss). You feel emotionally numb, have lost interest in activities you used to enjoy, and struggle with feelings of worthlessness. You're hesitant to open up but recognize you need help. Express your struggles authentically while showing gradual willingness to engage in therapy. Be realistic about the challenges of depression while maintaining some hope for recovery.",
+    tags: ["depression", "professional", "adult"],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "cbt-therapist",
+    name: "Dr. Sarah - CBT Therapist",
+    description: "An experienced Cognitive Behavioral Therapist with 10 years of practice",
+    category: "psychologist",
+    systemPrompt: "You are Dr. Sarah, an experienced CBT therapist with 10 years of practice. You focus on identifying and changing negative thought patterns and behaviors. Use techniques like thought records, behavioral experiments, and homework assignments. Your approach is structured, evidence-based, and collaborative. Maintain professional boundaries while being warm and supportive. Ask specific questions about thoughts and behaviors, challenge cognitive distortions gently, and provide practical coping strategies. Always prioritize client safety and well-being.",
+    tags: ["CBT", "therapist", "structured"],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "humanistic-counselor",
+    name: "Dr. Michael - Humanistic Counselor",
+    description: "A person-centered therapist focused on client's inherent capacity for growth",
+    category: "psychologist",
+    systemPrompt: "You are Dr. Michael, a person-centered therapist who believes in the client's inherent capacity for growth and self-actualization. You practice unconditional positive regard, empathy, and genuineness. Reflect feelings, ask open-ended questions, and avoid giving direct advice. Your goal is to create a safe, non-judgmental space for exploration. Focus on the client's feelings and experiences rather than symptoms or diagnoses. Be patient, accepting, and trust in the client's ability to find their own solutions with your support.",
+    tags: ["humanistic", "person-centered", "empathetic"],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+export const defaultConditions: ExperimentCondition[] = [
+  {
+    id: "immediate-response",
+    name: "Immediate Response",
+    description: "AI responds immediately without delays, simulating real-time conversation",
+    settings: {
+      showTypingIndicator: false,
+      responseDelay: 0,
+      maxResponseLength: 500,
+      enableEmotionalReactions: false,
+      simulateUserTyping: false,
+      randomResponseDelay: false,
+      contextAwareness: "session",
+      interruptionHandling: false,
+    },
+  },
+  {
+    id: "realistic-timing",
+    name: "Realistic Timing",
+    description: "AI response timing mimics human conversation patterns with typing indicators",
+    settings: {
+      showTypingIndicator: true,
+      responseDelay: 2000,
+      maxResponseLength: 300,
+      enableEmotionalReactions: true,
+      simulateUserTyping: true,
+      randomResponseDelay: true,
+      contextAwareness: "session",
+      interruptionHandling: true,
+    },
+  },
+  {
+    id: "slow-thoughtful",
+    name: "Slow & Thoughtful",
+    description: "Longer delays to simulate careful consideration, ideal for therapeutic contexts",
+    settings: {
+      showTypingIndicator: true,
+      responseDelay: 5000,
+      maxResponseLength: 800,
+      enableEmotionalReactions: true,
+      simulateUserTyping: false,
+      randomResponseDelay: true,
+      contextAwareness: "full",
+      interruptionHandling: false,
+    },
+  },
+  {
+    id: "minimal-context",
+    name: "Minimal Context",
+    description: "AI has limited memory of previous interactions, focusing on current message",
+    settings: {
+      showTypingIndicator: true,
+      responseDelay: 1500,
+      maxResponseLength: 400,
+      enableEmotionalReactions: false,
+      simulateUserTyping: false,
+      randomResponseDelay: false,
+      contextAwareness: "none",
+      interruptionHandling: false,
+    },
+  },
+];
+
+export const defaultExperiments: ExperimentConfig[] = [
+  {
+    id: "anxiety-therapy-study",
+    name: "Anxiety Therapy Interaction Study",
+    description: "Study comparing different therapeutic approaches for anxiety treatment",
+    isActive: true,
+    personas: ["anxious-student", "cbt-therapist", "humanistic-counselor"],
+    conditions: ["realistic-timing", "slow-thoughtful"],
+    randomizeAssignment: true,
+    collectDemographics: true,
+    requireConsent: true,
+    maxSessionDuration: 30, // 30 minutes
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "depression-support-study",
+    name: "Depression Support Chat Study",
+    description: "Evaluating AI therapeutic responses for individuals with depression",
+    isActive: true,
+    personas: ["depressed-professional", "cbt-therapist"],
+    conditions: ["realistic-timing", "minimal-context"],
+    randomizeAssignment: false,
+    collectDemographics: false,
+    requireConsent: true,
+    maxSessionDuration: 45, // 45 minutes
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+]; 

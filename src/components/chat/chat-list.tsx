@@ -24,19 +24,27 @@ export default function ChatList({
   loadingSubmit,
   reload,
 }: ChatListProps) {
+  const lastMessage = messages[messages.length - 1];
+  const isLastMessageStreaming =
+    lastMessage?.role === "assistant" && isLoading;
+
+  const messagesToShow = isLastMessageStreaming
+    ? messages.slice(0, messages.length - 1)
+    : messages;
+
   return (
     <div className="flex-1 w-full overflow-y-auto">
       <ChatMessageList>
-        {messages.map((message, index) => (
+        {messagesToShow.map((message, index) => (
           <ChatMessage
             key={message.id || index}
             message={message}
-            isLast={index === messages.length - 1}
-            isLoading={isLoading}
+            isLast={index === messagesToShow.length - 1}
+            isLoading={isLoading && index === messagesToShow.length - 1}
             reload={reload}
           />
         ))}
-        {loadingSubmit && (
+        {(loadingSubmit || isLastMessageStreaming) && (
           <ChatBubble variant="received">
             <ChatBubbleAvatar
               src="/ollama.png"

@@ -11,8 +11,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import useChatStore from "@/app/hooks/useChatStore";
+import { useExperimentStore } from "@/app/hooks/useExperimentStore";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { ExperimentIndicator } from "@/components/experiment-indicator";
 
 export interface ChatProps {
   id: string;
@@ -61,6 +63,14 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   const getMessagesById = useChatStore((state) => state.getMessagesById);
   const router = useRouter();
 
+  // Experiment store
+  const { 
+    currentSession, 
+    personas, 
+    conditions, 
+    updateSession 
+  } = useExperimentStore();
+
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     window.history.replaceState({}, "", `/c/${id}`);
@@ -85,9 +95,22 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
         }))
       : [];
 
+    // Get experiment data if available
+    let experimentData = null;
+    if (currentSession) {
+      const persona = personas.find(p => p.id === currentSession.personaId);
+      const condition = conditions.find(c => c.id === currentSession.conditionId);
+      
+      experimentData = {
+        personaSystemPrompt: persona?.systemPrompt,
+        condition: condition,
+      };
+    }
+
     const requestOptions: ChatRequestOptions = {
       body: {
         selectedModel: selectedModel,
+        experimentData: experimentData,
       },
       ...(base64Images && {
         data: {
@@ -100,6 +123,11 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     handleSubmit(e, requestOptions);
     saveMessages(id, [...messages, userMessage]);
     setBase64Images(null);
+
+    // Update experiment session
+    if (currentSession) {
+      updateSession(currentSession.id, [...messages, userMessage]);
+    }
   };
 
   const removeLatestMessage = () => {
@@ -117,6 +145,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
 
   return (
     <div className="flex flex-col w-full max-w-3xl h-full">
+      <ExperimentIndicator />
       <ChatTopbar
         isLoading={isLoading}
         chatId={id}

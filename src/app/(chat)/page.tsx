@@ -8,27 +8,71 @@ import {
   DialogTitle,
   DialogContent,
 } from "@/components/ui/dialog";
-import UsernameForm from "@/components/username-form";
+import { ExperimentSetup } from "@/components/experiment-setup";
 import { generateUUID } from "@/lib/utils";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import useChatStore from "../hooks/useChatStore";
+import { useExperimentStore } from "../hooks/useExperimentStore";
 
 export default function Home() {
   const id = generateUUID();
-  const [open, setOpen] = React.useState(false);
+  const [setupOpen, setSetupOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const userName = useChatStore((state) => state.userName);
   const setUserName = useChatStore((state) => state.setUserName);
+  const { 
+    currentExperiment, 
+    currentParticipant, 
+    currentSession,
+    loadExperiments,
+    experiments 
+  } = useExperimentStore();
 
-  const onOpenChange = (isOpen: boolean) => {
-    if (userName) return setOpen(isOpen);
+  useEffect(() => {
+    const initializeExperiments = async () => {
+      await loadExperiments();
+      setIsLoading(false);
+    };
+    initializeExperiments();
+  }, [loadExperiments]);
 
-    setUserName("Anonymous");
-    setOpen(isOpen);
+  useEffect(() => {
+    // Only check after experiments are loaded
+    if (isLoading) return;
+    
+    // Check if there's an active experiment and we need to set up a session
+    const activeExperiments = experiments.filter(e => e.isActive);
+    console.log('Active experiments:', activeExperiments.length);
+    console.log('Current session:', currentSession);
+    console.log('Current participant:', currentParticipant);
+    
+    // Show setup if there are active experiments and no current session
+    if (activeExperiments.length > 0 && !currentSession) {
+      setSetupOpen(true);
+    }
+  }, [experiments, currentSession, isLoading]);
+
+  const onSetupComplete = () => {
+    setSetupOpen(false);
+    if (!userName) {
+      setUserName("Participant");
+    }
   };
+
+  // Show loading while experiments are being fetched
+  if (isLoading) {
+    return (
+      <main className="flex h-[calc(100dvh)] flex-col items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading experiments...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex h-[calc(100dvh)] flex-col items-center ">
-      <Dialog open={open} onOpenChange={onOpenChange}>
         <ChatLayout
           key={id}
           id={id}
@@ -36,15 +80,20 @@ export default function Home() {
           navCollapsedSize={10}
           defaultLayout={[30, 160]}
         />
-        <DialogContent className="flex flex-col space-y-4">
+      
+      <Dialog open={setupOpen} onOpenChange={(open) => {
+        // Don't allow closing the dialog manually - only through setup completion
+        if (!open) return;
+        setSetupOpen(open);
+      }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()}>
           <DialogHeader className="space-y-2">
-            <DialogTitle>Welcome to Ollama!</DialogTitle>
+            <DialogTitle>Psychology Experiment Setup</DialogTitle>
             <DialogDescription>
-              Enter your name to get started. This is just to personalize your
-              experience.
+              Welcome to our psychology research study. Please complete the setup to begin.
             </DialogDescription>
-            <UsernameForm setOpen={setOpen} />
           </DialogHeader>
+          <ExperimentSetup onComplete={onSetupComplete} />
         </DialogContent>
       </Dialog>
     </main>

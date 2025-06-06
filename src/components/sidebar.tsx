@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
+import { MoreHorizontal, SquarePen, Trash2, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Message } from "ai/react";
@@ -166,7 +166,13 @@ export function Sidebar({
         </div>
       </div>
 
-      <div className="justify-end px-2 py-2 w-full border-t">
+      <div className="justify-end px-2 py-2 w-full border-t space-y-2">
+        <Link href="/admin">
+          <Button variant="outline" className="w-full gap-2">
+            <Settings className="h-4 w-4" />
+            {!isCollapsed && "Admin Panel"}
+          </Button>
+        </Link>
         <UserSettings />
       </div>
     </div>
