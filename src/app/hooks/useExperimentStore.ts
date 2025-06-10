@@ -53,9 +53,10 @@ interface ExperimentActions {
   setCurrentParticipant: (participant: Participant) => void;
   
   // Session management
-  startSession: (participantId: string, personaId: string, conditionId: string) => Promise<ExperimentSession>;
+  startSession: (participantId: string, personaId: string, conditionId: string, chatId?: string) => Promise<ExperimentSession>;
   updateSession: (sessionId: string, messages: Message[]) => Promise<void>;
-  endSession: (sessionId: string) => Promise<void>;
+  updateSessionChatId: (sessionId: string, chatId: string) => Promise<void>;
+  endSession: (sessionId?: string) => Promise<void>;
   saveSessionToFirebase: (session: ExperimentSession) => Promise<void>;
 }
 
@@ -237,7 +238,7 @@ export const useExperimentStore = create<ExperimentState & ExperimentActions>()(
       setCurrentParticipant: (participant) => set({ currentParticipant: participant }),
 
       // Session management
-      startSession: async (participantId, personaId, conditionId) => {
+      startSession: async (participantId, personaId, conditionId, chatId) => {
         // Safely detect device type
         const userAgent = navigator?.userAgent || '';
         const isMobile = /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(userAgent);
@@ -252,6 +253,7 @@ export const useExperimentStore = create<ExperimentState & ExperimentActions>()(
           participantId: participantId || '',
           personaId: personaId || '',
           conditionId: conditionId || '',
+          chatId: chatId,
           messages: [],
           startTime: new Date().toISOString(),
           metadata: {
@@ -295,9 +297,22 @@ export const useExperimentStore = create<ExperimentState & ExperimentActions>()(
         }
       },
 
-      endSession: async (sessionId) => {
+      updateSessionChatId: async (sessionId, chatId) => {
         const { currentSession } = get();
         if (!currentSession || currentSession.id !== sessionId) return;
+
+        const updatedSession = {
+          ...currentSession,
+          chatId: chatId,
+        };
+
+        set({ currentSession: updatedSession });
+        await get().saveSessionToFirebase(updatedSession);
+      },
+
+      endSession: async (sessionId) => {
+        const { currentSession } = get();
+        if (!currentSession || (sessionId && currentSession.id !== sessionId)) return;
 
         // Calculate session duration safely
         const startTime = new Date(currentSession.startTime).getTime();
@@ -314,7 +329,7 @@ export const useExperimentStore = create<ExperimentState & ExperimentActions>()(
         };
 
         await get().saveSessionToFirebase(endedSession);
-        set({ currentSession: null });
+        set({ currentSession: null, currentParticipant: null, currentExperiment: null });
       },
 
       saveSessionToFirebase: async (session) => {

@@ -25,9 +25,10 @@ type DemographicsFormData = z.infer<typeof demographicsSchema>;
 
 interface ExperimentSetupProps {
   onComplete: () => void;
+  chatId?: string;
 }
 
-export function ExperimentSetup({ onComplete }: ExperimentSetupProps) {
+export function ExperimentSetup({ onComplete, chatId }: ExperimentSetupProps) {
   const {
     experiments,
     personas,
@@ -117,7 +118,7 @@ export function ExperimentSetup({ onComplete }: ExperimentSetupProps) {
         // Demographics would be collected in real implementation
       });
 
-      await startSession(participant.id, selectedPersona.id, selectedCondition.id);
+      await startSession(participant.id, selectedPersona.id, selectedCondition.id, chatId);
       setCurrentExperiment(selectedExperiment);
       onComplete();
     } catch (error) {

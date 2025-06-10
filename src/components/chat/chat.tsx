@@ -72,6 +72,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     personas, 
     conditions, 
     updateSession,
+    updateSessionChatId,
     loadPersonas,
     loadConditions
   } = useExperimentStore();
@@ -116,6 +117,11 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     // Navigate to the chat URL now that the chat exists in store
     if (messages.length === 0) {
       router.replace(`/c/${id}`);
+    }
+
+    // Update session with chat ID if not already set
+    if (currentSession && !currentSession.chatId) {
+      updateSessionChatId(currentSession.id, id);
     }
 
     setLoadingSubmit(true);

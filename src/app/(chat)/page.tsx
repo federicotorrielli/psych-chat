@@ -13,8 +13,10 @@ import { generateUUID } from "@/lib/utils";
 import React, { useEffect, useState, useMemo } from "react";
 import useChatStore from "../hooks/useChatStore";
 import { useExperimentStore } from "../hooks/useExperimentStore";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   // Stable ID generation to prevent re-renders
   const id = useMemo(() => generateUUID(), []);
   const [setupOpen, setSetupOpen] = useState(false);
@@ -51,17 +53,20 @@ export default function Home() {
     // Only check after experiments are loaded
     if (isLoading) return;
     
+    // If there's an existing session with a chat ID, redirect to that chat
+    if (currentSession && currentSession.chatId) {
+      router.replace(`/c/${currentSession.chatId}`);
+      return;
+    }
+    
     // Check if there's an active experiment and we need to set up a session
     const activeExperiments = experiments.filter(e => e.isActive);
-    console.log('Active experiments:', activeExperiments.length);
-    console.log('Current session:', currentSession);
-    console.log('Current participant:', currentParticipant);
     
     // Show setup if there are active experiments and no current session
     if (activeExperiments.length > 0 && !currentSession) {
       setSetupOpen(true);
     }
-  }, [experiments, currentSession, isLoading]);
+  }, [experiments, currentSession, isLoading, router]);
 
   const onSetupComplete = () => {
     setSetupOpen(false);
@@ -104,7 +109,7 @@ export default function Home() {
               Welcome to our psychology research study. Please complete the setup to begin.
             </DialogDescription>
           </DialogHeader>
-          <ExperimentSetup onComplete={onSetupComplete} />
+          <ExperimentSetup onComplete={onSetupComplete} chatId={id} />
         </DialogContent>
       </Dialog>
     </main>

@@ -21,10 +21,22 @@ import { GearIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import EditUsernameForm from "./edit-username-form";
 import useChatStore from "@/app/hooks/useChatStore";
+import { useExperimentStore } from "@/app/hooks/useExperimentStore";
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 
 export default function ExperimentUserSettings() {
   const [open, setOpen] = useState(false);
   const userName = useChatStore((state) => state.userName);
+  const { endSession, currentSession } = useExperimentStore();
+  const router = useRouter();
+
+  const handleEndSession = async () => {
+    if (currentSession) {
+      await endSession();
+      router.push('/');
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -65,6 +77,13 @@ export default function ExperimentUserSettings() {
             </DialogHeader>
           </DialogContent>
         </Dialog>
+        
+        <DropdownMenuItem onClick={handleEndSession} className="text-destructive">
+          <div className="flex w-full gap-2 p-1 items-center cursor-pointer">
+            <LogOut className="w-4 h-4" />
+            End Session
+          </div>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

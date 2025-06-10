@@ -32,6 +32,7 @@ export interface ExperimentSession {
   participantId: string;
   personaId: string;
   conditionId: string;
+  chatId?: string; // Link to chat store
   messages: Message[];
   startTime: string;
   endTime?: string;
