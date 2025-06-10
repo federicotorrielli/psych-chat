@@ -1,0 +1,116 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Development Workflow
+
+## Environment Setup
+
+### Required Services
+- **Ollama**: Download and run locally (http://localhost:11434)
+- **Firebase**: Configure project with Firestore and Auth
+- **Node.js**: Version 18+ with pnpm package manager
+
+### Environment Variables (.env)
+```bash
+OLLAMA_URL="http://localhost:11434"
+NEXT_PUBLIC_FIREBASE_API_KEY=""
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=""
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=""
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=""
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=""
+NEXT_PUBLIC_FIREBASE_APP_ID=""
+```
+
+## Development Commands
+
+```bash
+pnpm dev           # Start development server
+pnpm build         # Production build
+pnpm start         # Start production server
+pnpm lint          # ESLint checking
+```
+
+## Project Configuration
+
+### Next.js Config
+- **Edge runtime** for API routes
+- **Image optimization** with Sharp
+- **Experimental features** for app directory
+
+### TypeScript Config
+- **Strict mode** enabled
+- **Path aliases** using `@/` for src directory
+- **Latest ESNext** target for modern browsers
+
+### Tailwind Config
+- **Dark mode** via CSS class strategy
+- **shadcn/ui integration** with CSS variables
+- **Custom animations** for accordion and UI effects
+- **Responsive breakpoints** with 2xl max container
+
+## Development Patterns
+
+### Adding New Experiments
+1. Define experiment config in admin interface
+2. Create personas with appropriate system prompts
+3. Configure experimental conditions
+4. Test chat flow with different participants
+
+### Adding UI Components
+1. Use shadcn/ui CLI: `npx shadcn-ui@latest add [component]`
+2. Place custom components in appropriate directories
+3. Follow existing naming conventions
+4. Implement responsive design patterns
+
+### Firebase Development
+- **Use emulators** for local development when possible
+- **Seed data** automatically loads if collections are empty
+- **Test offline fallbacks** to ensure graceful degradation
+
+## Testing Strategies
+
+### Manual Testing Checklist
+- [ ] Experiment setup flow works end-to-end
+- [ ] Chat interface responds correctly to different personas
+- [ ] Experimental conditions modify behavior as expected
+- [ ] Admin interface CRUD operations function
+- [ ] Mobile responsiveness across all screens
+- [ ] Voice input works in supported browsers
+
+### Data Validation
+- [ ] Participant consent properly recorded
+- [ ] Session data persists to Firebase
+- [ ] Message metadata includes all required fields
+- [ ] Experiment assignment randomization works
+
+## Deployment Considerations
+
+### Docker Deployment
+- **Multi-stage build** optimized for production
+- **Health checks** for Ollama connectivity
+- **Environment variable** injection for configuration
+
+### Production Checklist
+- [ ] Firebase security rules configured
+- [ ] Ollama server properly secured
+- [ ] CORS settings for cross-origin requests
+- [ ] Rate limiting for API endpoints
+- [ ] Error monitoring and logging
+
+## Performance Optimization
+
+- **Edge runtime** for faster API responses
+- **Streaming responses** for real-time chat experience
+- **Lazy loading** for admin interface components
+- **Image optimization** for multi-modal chat features
+- **Component memoization** for frequently re-rendered elements
+
+## Security Best Practices
+
+- **Environment variables** for sensitive configuration
+- **Firebase security rules** for data access control
+- **Input validation** with Zod schemas
+- **CSRF protection** via Next.js defaults
+- **Content Security Policy** for XSS prevention

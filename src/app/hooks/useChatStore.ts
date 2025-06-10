@@ -26,6 +26,7 @@ interface Actions {
   getMessagesById: (chatId: string) => Message[];
   saveMessages: (chatId: string, messages: Message[]) => void;
   handleDelete: (chatId: string, messageId?: string) => void;
+  deleteAllChats: () => void;
   setUserName: (userName: string) => void;
   startDownload: (modelName: string) => void;
   stopDownload: () => void;
@@ -42,7 +43,7 @@ const useChatStore = create<State & Actions>()(
       userName: "Anonymous",
       isDownloading: false,
       downloadProgress: 0,
-      downloadingModel: null, 
+      downloadingModel: null,
 
       setBase64Images: (base64Images) => set({ base64Images }),
       setUserName: (userName) => set({ userName }),
@@ -101,10 +102,25 @@ const useChatStore = create<State & Actions>()(
         });
       },
 
+      deleteAllChats: () => {
+        set(() => ({
+          chats: {},
+          currentChatId: null,
+        }));
+      },
+
       startDownload: (modelName) =>
-        set({ isDownloading: true, downloadingModel: modelName, downloadProgress: 0 }),
+        set({
+          isDownloading: true,
+          downloadingModel: modelName,
+          downloadProgress: 0,
+        }),
       stopDownload: () =>
-        set({ isDownloading: false, downloadingModel: null, downloadProgress: 0 }),
+        set({
+          isDownloading: false,
+          downloadingModel: null,
+          downloadProgress: 0,
+        }),
       setDownloadProgress: (progress) => set({ downloadProgress: progress }),
     }),
     {

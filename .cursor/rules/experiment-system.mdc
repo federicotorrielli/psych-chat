@@ -1,0 +1,89 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Psychology Experiment System
+
+## Core Domain Models
+
+### Experiment Workflow
+1. **ExperimentConfig** - defines experiment parameters
+2. **Participant** - created with consent and demographics  
+3. **ExperimentSession** - active conversation session
+4. **Persona** - AI character with system prompt
+5. **ExperimentCondition** - behavioral parameters
+
+### Data Relationships
+
+```
+ExperimentConfig
+├── personas[] (persona IDs)
+├── conditions[] (condition IDs)
+└── settings (randomization, consent, demographics)
+
+ExperimentSession
+├── participantId
+├── personaId  
+├── conditionId
+├── messages[] (AI chat messages)
+└── metadata (timing, device info)
+```
+
+## Experiment State Management
+
+- **useExperimentStore** manages all experiment-related state
+- **Firebase collections**: experiments, personas, conditions, participants, sessions
+- **Zustand persistence** for current session state
+- **Automatic seeding** from `defaultData` if Firebase is empty
+
+## Persona System
+
+- **Two categories**: 'patient' | 'psychologist' 
+- **System prompts** define AI behavior and character
+- **Tags** for categorization and filtering
+- **Dynamic assignment** based on experiment randomization settings
+
+## Experimental Conditions
+
+Control conversation behavior:
+- `showTypingIndicator`: UI feedback
+- `responseDelay`: artificial latency (ms)
+- `maxResponseLength`: token limits  
+- `enableEmotionalReactions`: behavioral flags
+- `contextAwareness`: 'none' | 'session' | 'full'
+- `randomResponseDelay`: randomize timing
+
+## Session Management Patterns
+
+```tsx
+// Starting a session
+const session = await startSession(participantId, personaId, conditionId);
+
+// Updating with new messages
+await updateSession(sessionId, updatedMessages);
+
+// Ending session
+await endSession(sessionId);
+```
+
+## Consent & Ethics
+
+- **Informed consent required** before participation
+- **Demographics collection** is configurable per experiment
+- **Voluntary participation** with withdrawal options
+- **Data confidentiality** promises in consent text
+
+## Firebase Integration
+
+- **Offline fallbacks** to default data if Firebase fails
+- **Real-time updates** for admin interface
+- **CRUD operations** wrapped in stores
+- **Error handling** with console logging and graceful degradation
+
+## Admin Interface Patterns
+
+- **Nested routes** under `/admin/` for different data types
+- **CRUD forms** using react-hook-form + zod
+- **Real-time data sync** with Firebase
+- **Bulk operations** for managing experiments

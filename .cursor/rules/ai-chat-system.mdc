@@ -1,0 +1,96 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# AI Chat System
+
+## Ollama Integration
+
+- **Local LLM inference** via ollama-ai-provider
+- **Environment variable**: `OLLAMA_URL` (default: http://localhost:11434)
+- **Edge runtime** for streaming responses
+- **Model selection** configured via selectedModel parameter
+
+## Chat API Pattern (`/api/chat/route.ts`)
+
+```tsx
+export async function POST(req: Request) {
+  const { messages, selectedModel, data, experimentData } = await req.json();
+  
+  // System prompt injection for personas
+  const systemPrompt = experimentData?.personaSystemPrompt;
+  
+  // Apply experimental conditions
+  const condition = experimentData?.condition;
+  
+  // Stream response with Vercel AI SDK
+  const result = await streamText(streamOptions);
+  return result.toDataStreamResponse();
+}
+```
+
+## Experimental Chat Modifications
+
+### System Prompt Injection
+- **First message**: Prepend system prompt to user message
+- **Subsequent messages**: Add system message to conversation
+
+### Condition-Based Behavior
+- **Response delays**: Artificial latency before streaming
+- **Random delays**: Randomize timing for naturalness  
+- **Token limits**: Constrain response length via maxTokens
+- **Context awareness**: Control memory across conversation
+
+### Image Support
+- **Multi-modal input** via `data.images` array
+- **URL-based images** converted to Vision API format
+- **Integrated with personas** for visual analysis scenarios
+
+## Chat Store (`useChatStore`)
+
+State management for chat interface:
+- **Username handling** for participant identification
+- **Message persistence** in localStorage
+- **Real-time updates** during conversation
+- **Session linking** with experiment data
+
+## Chat Components Architecture
+
+```
+ChatLayout
+├── ChatTopbar (model selection, experiment info)
+├── ChatList (message display)
+│   └── ChatMessage (individual messages)
+└── ChatBottombar (input, voice, attachments)
+```
+
+## Message Flow
+
+1. **User input** → ChatBottombar
+2. **API call** → /api/chat with experiment context
+3. **Ollama processing** → with persona system prompt
+4. **Streaming response** → real-time display
+5. **Session update** → Firebase persistence
+
+## Voice Integration
+
+- **Speech Recognition API** for voice input
+- **useSpeechRecognition hook** for state management
+- **Real-time transcription** with confidence scoring
+- **Error handling** for browser compatibility
+
+## Conversation Features
+
+- **Code syntax highlighting** via react-code-blocks
+- **Markdown rendering** with react-markdown + remark-gfm
+- **Copy code blocks** with one-click functionality
+- **Emoji picker** integration for expression
+- **File attachments** via react-dropzone
+
+## Chat Persistence
+
+- **localStorage** for immediate persistence
+- **Firebase sessions** for research data
+- **Message metadata** including timestamps and experimental context
+- **Export capabilities** for data analysis

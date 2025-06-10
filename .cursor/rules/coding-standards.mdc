@@ -1,0 +1,78 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Coding Standards & Conventions
+
+You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, Radix UI and Tailwind.
+
+## Code Style & Structure
+
+- **Functional and declarative patterns** - avoid classes
+- **Descriptive variable names** with auxiliary verbs (isLoading, hasError)
+- **File structure**: exported component, subcomponents, helpers, static content, types
+- **TypeScript for all code** - prefer interfaces over types, avoid enums
+- **Use "function" keyword** for pure functions
+- **Declarative JSX** with concise conditionals
+
+## Naming & Organization
+
+- **kebab-case**: files (`experiment-setup.tsx`) and directories (`components/auth-wizard`)
+- **PascalCase**: components (`ExperimentSetup`)
+- **camelCase**: functions and variables
+- **Named exports** for components
+- **Types** in `/src/types/`, **hooks** in `/src/app/hooks/`
+
+## State & Performance
+
+- **Zustand stores** for complex state (`useExperimentStore`, `useChatStore`)
+- **Firebase in stores**, not components
+- **'nuqs'** for URL search parameters
+- **Minimize 'use client'** - favor React Server Components
+- **Suspense** for client components, **dynamic loading** for non-critical
+
+## UI & Styling
+
+- **Shadcn UI, Radix, Tailwind** - mobile-first, dark mode default
+- **TailwindCSS only** (except globals.css)
+- **WebP images** with lazy loading
+
+## Component Pattern
+
+```tsx
+"use client";
+
+import { ComponentType } from "@/types/component";
+import { useStore } from "@/app/hooks/useStore";
+
+interface ComponentProps {
+  // Props interface
+}
+
+export function ComponentName({ prop }: ComponentProps) {
+  const { state, actions } = useStore();
+  const [localState, setLocalState] = useState();
+  
+  const handleEvent = () => {
+    // handler logic
+  };
+  
+  return <div className="tailwind-classes">{/* JSX */}</div>;
+}
+```
+
+## Data & Validation
+
+- **Firebase operations** in try-catch with fallbacks
+- **Zod schemas** for form validation
+- **react-hook-form** with zod resolvers
+- **Message types** from `ai` package for chat
+- **Experimental data** follows `/src/types/experiment.ts`
+
+## Additional Patterns
+
+- **Route handlers** in `/src/app/api/` following Next.js conventions
+- **Error handling**: try-catch with user-friendly fallbacks
+- **Forms**: react-hook-form with async submission handling
+- **Follow Next.js docs** for Data Fetching, Rendering, and Routing

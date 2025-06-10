@@ -1,0 +1,63 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Psychology Experiment Platform
+
+This is a Next.js-based AI-powered psychology experiment platform designed for researchers to conduct human-AI interaction studies.
+
+## Core Architecture
+
+- **Frontend**: Next.js 14 with App Router, TypeScript, React 18
+- **Styling**: TailwindCSS with shadcn/ui components, dark mode default
+- **State Management**: Zustand with persistence
+- **Database**: Firebase Firestore
+- **AI Integration**: Ollama for local LLM inference
+- **Authentication**: Firebase Auth (configured but minimal usage)
+
+## Key Features
+
+1. **Experiment Management**: Create, configure, and manage psychology experiments
+2. **Persona System**: Define AI personas (patient/psychologist) with custom system prompts
+3. **Experimental Conditions**: Control conversation parameters (response delays, typing indicators, etc.)
+4. **Participant Management**: Consent forms, demographics collection, session tracking
+5. **Chat Interface**: Real-time conversation between participants and AI personas
+6. **Admin Dashboard**: Full CRUD interface for experiments, personas, and conditions
+7. **Data Collection**: Session recording, message tracking, metadata collection
+
+## Project Structure
+
+```
+src/
+├── app/              # Next.js App Router
+│   ├── (chat)/      # Main chat interface (route group)
+│   ├── admin/       # Admin dashboard
+│   ├── api/         # Backend API routes
+│   └── hooks/       # Custom React hooks
+├── components/       # React components
+│   ├── chat/        # Chat-specific components
+│   ├── admin/       # Admin interface components
+│   └── ui/          # shadcn/ui base components
+├── lib/             # Utility functions and configurations
+├── types/           # TypeScript type definitions
+├── providers/       # React context providers
+└── utils/           # Helper utilities
+```
+
+## Key Technologies & Dependencies
+
+- **AI/ML**: ollama-ai-provider, ai package (Vercel AI SDK)
+- **UI**: @radix-ui components, framer-motion, lucide-react
+- **Forms**: react-hook-form, zod validation
+- **Data**: Firebase SDK, @tanstack/react-query
+- **Voice**: DOM Speech Recognition API integration
+- **Misc**: uuid, lodash, react-markdown, react-dropzone
+
+## Design Principles
+
+- **Research-First**: Built specifically for psychology research with ethical considerations
+- **Local-First**: Ollama integration for privacy-conscious AI inference
+- **Responsive**: Mobile-friendly design for diverse participant access
+- **Accessible**: Following modern accessibility practices
+- **Modular**: Component-based architecture for easy extension
