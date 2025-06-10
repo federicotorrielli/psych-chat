@@ -47,10 +47,11 @@ export default function ChatList({
         {(loadingSubmit || isLastMessageStreaming) && (
           <ChatBubble variant="received">
             <ChatBubbleAvatar
-              src="/ollama.png"
+              src=""
               width={6}
               height={6}
               className="object-contain dark:invert"
+              fallback="👤"
             />
             <ChatBubbleMessage isLoading />
           </ChatBubble>

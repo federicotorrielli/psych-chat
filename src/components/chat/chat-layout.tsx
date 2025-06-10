@@ -12,6 +12,7 @@ import { Message, useChat } from "ai/react";
 import Chat, { ChatProps } from "./chat";
 import ChatList from "./chat-list";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
+import { useExperimentStore } from "@/app/hooks/useExperimentStore";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
@@ -30,6 +31,10 @@ export function ChatLayout({
 }: MergedProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
   const [isMobile, setIsMobile] = useState(false);
+  const { currentSession } = useExperimentStore();
+  
+  // Hide sidebar during experiment sessions
+  const hideSidebar = !!currentSession;
 
   useEffect(() => {
     const checkScreenWidth = () => {
@@ -47,6 +52,15 @@ export function ChatLayout({
       window.removeEventListener("resize", checkScreenWidth);
     };
   }, []);
+
+  if (hideSidebar) {
+    // During experiments, show only the chat without sidebar
+    return (
+      <div className="h-screen w-full flex justify-center">
+        <Chat id={id} initialMessages={initialMessages} isMobile={isMobile} />
+      </div>
+    );
+  }
 
   return (
     <ResizablePanelGroup

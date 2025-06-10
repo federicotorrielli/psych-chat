@@ -17,64 +17,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { GearIcon, CaretSortIcon } from "@radix-ui/react-icons";
-import { useEffect, useState } from "react";
-import { Loader2, Trash2 } from "lucide-react";
-import { Skeleton } from "./ui/skeleton";
-import { set } from "zod";
-import UsernameForm from "./username-form";
+import { GearIcon } from "@radix-ui/react-icons";
+import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import EditUsernameForm from "./edit-username-form";
 import PullModel from "./pull-model";
 import useChatStore from "@/app/hooks/useChatStore";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export default function UserSettings() {
+interface UserSettingsProps {
+  variant?: 'sidebar' | 'floating';
+}
+
+export default function UserSettings({ variant = 'sidebar' }: UserSettingsProps) {
   const [open, setOpen] = useState(false);
-  const [models, setModels] = useState<string[]>([]);
-  const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
 
   const userName = useChatStore((state) => state.userName);
-  const selectedModel = useChatStore((state) => state.selectedModel);
-  const setSelectedModel = useChatStore((state) => state.setSelectedModel);
   const deleteAllChats = useChatStore((state) => state.deleteAllChats);
   const router = useRouter();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/tags");
-        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-
-        const data = await res.json().catch(() => null);
-        if (!data?.models?.length) return;
-
-        const modelNames = data.models.map(({ name }: { name: string }) => name);
-        setModels(modelNames);
-        
-        // Set default model if none is selected
-        if (!selectedModel && modelNames.length > 0) {
-          const defaultModel = modelNames.find((name: string) => name.includes('gemma:2b')) || modelNames[0];
-          setSelectedModel(defaultModel);
-        }
-      } catch (error) {
-        console.error("Error fetching models:", error);
-      }
-    })();
-  }, [selectedModel, setSelectedModel]);
-
-  const handleModelChange = (model: string) => {
-    setSelectedModel(model);
-    setModelSelectorOpen(false);
-    toast.success(`Model changed to ${model}`);
-  };
 
   const handleDeleteAllChats = () => {
     if (window.confirm("Are you sure you want to delete all chats? This action cannot be undone.")) {
@@ -84,28 +48,36 @@ export default function UserSettings() {
     }
   };
 
+  const buttonClassName = variant === 'floating' 
+    ? "flex justify-center gap-2 h-11 text-sm font-medium items-center px-4 bg-card hover:bg-accent border border-border rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+    : "flex justify-start gap-3 w-full h-14 text-base font-normal items-center";
+    
+  const avatarSize = variant === 'floating' ? "w-7 h-7" : "";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          className="flex justify-start gap-3 w-full h-14 text-base font-normal items-center "
+          variant={variant === 'floating' ? 'outline' : 'ghost'}
+          className={buttonClassName}
         >
-          <Avatar className="flex justify-start items-center overflow-hidden">
+          <Avatar className={`flex justify-start items-center overflow-hidden ${avatarSize}`}>
             <AvatarImage
               src=""
-              alt="AI"
+              alt="User"
               width={4}
               height={4}
               className="object-contain"
             />
-            <AvatarFallback>
+            <AvatarFallback className={variant === 'floating' ? 'text-xs' : ''}>
               {userName.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="text-xs truncate">
-            <p>{userName}</p>
-          </div>
+          {variant === 'sidebar' && (
+            <div className="text-xs truncate">
+              <p>{userName}</p>
+            </div>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48 p-2">
@@ -126,45 +98,7 @@ export default function UserSettings() {
               <DialogTitle>Settings</DialogTitle>
               <EditUsernameForm setOpen={setOpen} />
               
-              <div className="pt-4 border-t">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-foreground">AI Model</h3>
-                    <p className="text-xs text-muted-foreground">Select the AI model for conversations</p>
-                  </div>
-                  <Popover open={modelSelectorOpen} onOpenChange={setModelSelectorOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={modelSelectorOpen}
-                        className="w-full justify-between"
-                      >
-                        {selectedModel || "Select model"}
-                        <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-1">
-                      {models.length > 0 ? (
-                        models.map((model) => (
-                          <Button
-                            key={model}
-                            variant="ghost"
-                            className="w-full justify-start"
-                            onClick={() => handleModelChange(model)}
-                          >
-                            {model}
-                          </Button>
-                        ))
-                      ) : (
-                        <Button variant="ghost" disabled className="w-full">
-                          No models available
-                        </Button>
-                      )}
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
+
 
               <div className="pt-4 border-t">
                 <div className="space-y-4">

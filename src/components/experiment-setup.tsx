@@ -141,10 +141,10 @@ export function ExperimentSetup({ onComplete }: ExperimentSetupProps) {
           <CardContent className="space-y-4">
             <div className="bg-muted p-4 rounded-md text-sm space-y-3">
               <p><strong>Study Title:</strong> {selectedExperiment?.name || "Psychology Research Study"}</p>
-              <p><strong>Purpose:</strong> {selectedExperiment?.description || "This study investigates human-AI interaction in psychological contexts."}</p>
-              <p><strong>Procedure:</strong> You will engage in a conversation with an AI persona. Your responses will be recorded for research purposes.</p>
+                              <p><strong>Purpose:</strong> {selectedExperiment?.description || "This study investigates communication patterns in psychological contexts."}</p>
+                              <p><strong>Procedure:</strong> You will engage in a conversation with another participant. Your responses will be recorded for research purposes.</p>
               <p><strong>Risks:</strong> There are minimal risks associated with this study.</p>
-              <p><strong>Benefits:</strong> Your participation contributes to understanding human-AI interaction.</p>
+                              <p><strong>Benefits:</strong> Your participation contributes to understanding human communication patterns.</p>
               <p><strong>Confidentiality:</strong> Your data will be kept confidential and used only for research purposes.</p>
               <p><strong>Voluntary Participation:</strong> Your participation is voluntary and you may withdraw at any time.</p>
             </div>
@@ -253,10 +253,10 @@ export function ExperimentSetup({ onComplete }: ExperimentSetupProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5" />
-              Choose Your AI Persona
+              Choose Your Conversation Partner
             </CardTitle>
             <CardDescription>
-              Select the AI persona you would like to interact with
+              Select who you would like to have a conversation with
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -348,7 +348,7 @@ export function ExperimentSetup({ onComplete }: ExperimentSetupProps) {
                 <span>{selectedExperiment?.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium">AI Persona:</span>
+                <span className="font-medium">Conversation Partner:</span>
                 <span>{selectedPersona?.name} ({selectedPersona?.category})</span>
               </div>
               <div className="flex justify-between">
@@ -364,7 +364,7 @@ export function ExperimentSetup({ onComplete }: ExperimentSetupProps) {
             </div>
             
             <div className="bg-muted p-3 rounded-md text-sm">
-              <p><strong>Instructions:</strong> You will now begin a conversation with the AI persona. Be natural and engage as you would in a real conversation. Your responses will be recorded for research purposes.</p>
+              <p><strong>Instructions:</strong> You will now begin a conversation with your assigned conversation partner. Be natural and engage as you would in a real conversation. Your responses will be recorded for research purposes.</p>
             </div>
           </CardContent>
         </Card>

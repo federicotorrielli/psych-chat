@@ -15,6 +15,10 @@ import { useExperimentStore } from "@/app/hooks/useExperimentStore";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ExperimentIndicator } from "@/components/experiment-indicator";
+import Link from "next/link";
+import { Settings } from "lucide-react";
+import UserSettings from "@/components/user-settings";
+import ExperimentUserSettings from "@/components/experiment-user-settings";
 
 export interface ChatProps {
   id: string;
@@ -45,7 +49,6 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       const savedMessages = getMessagesById(id);
       saveMessages(id, [...savedMessages, message]);
       setLoadingSubmit(false);
-      router.replace(`/c/${id}`);
     },
     onError: (error) => {
       setLoadingSubmit(false);
@@ -68,12 +71,32 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     currentSession, 
     personas, 
     conditions, 
-    updateSession 
+    updateSession,
+    loadPersonas,
+    loadConditions
   } = useExperimentStore();
+
+  // Ensure personas and conditions are loaded
+  useEffect(() => {
+    if (personas.length === 0) loadPersonas();
+    if (conditions.length === 0) loadConditions();
+  }, [loadPersonas, loadConditions, personas.length, conditions.length]);
+
+  // Admin keyboard shortcut (Ctrl+Alt+A)
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.altKey && e.key === 'a') {
+        e.preventDefault();
+        router.push('/admin');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [router]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    window.history.replaceState({}, "", `/c/${id}`);
 
     if (!selectedModel) {
       toast.error("Please select a model");
@@ -85,6 +108,15 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       role: "user",
       content: input,
     };
+
+    // Save the chat IMMEDIATELY when first message is sent to prevent 404
+    const currentMessages = [...messages, userMessage];
+    saveMessages(id, currentMessages);
+    
+    // Navigate to the chat URL now that the chat exists in store
+    if (messages.length === 0) {
+      router.replace(`/c/${id}`);
+    }
 
     setLoadingSubmit(true);
 
@@ -101,10 +133,22 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       const persona = personas.find(p => p.id === currentSession.personaId);
       const condition = conditions.find(c => c.id === currentSession.conditionId);
       
-      experimentData = {
-        personaSystemPrompt: persona?.systemPrompt,
-        condition: condition,
-      };
+      if (persona) {
+        experimentData = {
+          personaSystemPrompt: persona.systemPrompt,
+          condition: condition,
+        };
+
+      } else {
+        // If we have a session but no persona found, this is a critical error
+        if (personas.length > 0) {
+          toast.error("Experiment configuration error: Persona not found");
+          return;
+        } else {
+          // Personas might still be loading
+          return;
+        }
+      }
     }
 
     const requestOptions: ChatRequestOptions = {
@@ -121,12 +165,11 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     };
 
     handleSubmit(e, requestOptions);
-    saveMessages(id, [...messages, userMessage]);
     setBase64Images(null);
 
     // Update experiment session
     if (currentSession) {
-      updateSession(currentSession.id, [...messages, userMessage]);
+      updateSession(currentSession.id, currentMessages);
     }
   };
 
@@ -146,6 +189,31 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   return (
     <div className="flex flex-col w-full max-w-3xl h-full">
       <ExperimentIndicator />
+      
+      {/* Admin access - top right */}
+      <div className="absolute top-4 right-4 z-50">
+        <Link href="/admin">
+          <button
+            className="p-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full opacity-10 hover:opacity-100 transition-opacity duration-300"
+            title="Admin Access (Ctrl+Alt+A)"
+            style={{ fontSize: '12px' }}
+          >
+            <Settings className="h-4 w-4" />
+          </button>
+        </Link>
+      </div>
+
+      {/* User settings - top left */}
+      {!isMobile && (
+        <div className="absolute top-4 left-4 z-50">
+          {currentSession ? (
+            <ExperimentUserSettings />
+          ) : (
+            <UserSettings variant="floating" />
+          )}
+        </div>
+      )}
+      
       <ChatTopbar
         isLoading={isLoading}
         chatId={id}
@@ -155,15 +223,11 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
 
       {messages.length === 0 ? (
         <div className="flex flex-col h-full w-full items-center gap-4 justify-center">
-          <Image
-            src="/ollama.png"
-            alt="AI"
-            width={40}
-            height={40}
-            className="h-16 w-14 object-contain dark:invert"
-          />
+          <div className="h-16 w-14 flex items-center justify-center text-4xl">
+            👤
+          </div>
           <p className="text-center text-base text-muted-foreground">
-            How can I help you today?
+            You are now chatting with your assigned conversation partner.
           </p>
           <ChatBottombar
             input={input}

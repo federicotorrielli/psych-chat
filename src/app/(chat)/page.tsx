@@ -10,16 +10,19 @@ import {
 } from "@/components/ui/dialog";
 import { ExperimentSetup } from "@/components/experiment-setup";
 import { generateUUID } from "@/lib/utils";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import useChatStore from "../hooks/useChatStore";
 import { useExperimentStore } from "../hooks/useExperimentStore";
 
 export default function Home() {
-  const id = generateUUID();
+  // Stable ID generation to prevent re-renders
+  const id = useMemo(() => generateUUID(), []);
   const [setupOpen, setSetupOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const userName = useChatStore((state) => state.userName);
   const setUserName = useChatStore((state) => state.setUserName);
+  const saveMessages = useChatStore((state) => state.saveMessages);
+  const getChatById = useChatStore((state) => state.getChatById);
   const { 
     currentExperiment, 
     currentParticipant, 
@@ -27,6 +30,14 @@ export default function Home() {
     loadExperiments,
     experiments 
   } = useExperimentStore();
+
+  // Pre-create empty chat session for smoother UX
+  useEffect(() => {
+    const existingChat = getChatById(id);
+    if (!existingChat) {
+      saveMessages(id, []);
+    }
+  }, [id, saveMessages, getChatById]);
 
   useEffect(() => {
     const initializeExperiments = async () => {

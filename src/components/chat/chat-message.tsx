@@ -78,18 +78,7 @@ function ChatMessage({ message, isLast, isLoading, reload }: ChatMessageProps) {
     </div>
   );
 
-  const renderThinkingProcess = () => (
-    thinkContent && message.role === "assistant" && (
-      <details className="mb-2 text-sm" open>
-        <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-          Thinking process
-        </summary>
-        <div className="mt-2 text-muted-foreground">
-          <Markdown remarkPlugins={[remarkGfm]}>{thinkContent}</Markdown>
-        </div>
-      </details>
-    )
-  );
+  const renderThinkingProcess = () => null;
 
   const renderContent = () => (
     contentParts.map((part, index) => (
@@ -103,50 +92,17 @@ function ChatMessage({ message, isLast, isLoading, reload }: ChatMessageProps) {
     ))
   );
 
-  const renderActionButtons = () => (
-    message.role === "assistant" && (
-      <div className="pt-2 flex gap-1 items-center text-muted-foreground">
-        {!isLoading && (
-          <ButtonWithTooltip side="bottom" toolTipText="Copy">
-            <Button
-              onClick={handleCopy}
-              variant="ghost"
-              size="icon"
-              className="h-4 w-4"
-            >
-              {isCopied ? (
-                <CheckIcon className="w-3.5 h-3.5 transition-all" />
-              ) : (
-                <CopyIcon className="w-3.5 h-3.5 transition-all" />
-              )}
-            </Button>
-          </ButtonWithTooltip>
-        )}
-        {!isLoading && isLast && (
-          <ButtonWithTooltip side="bottom" toolTipText="Regenerate">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-4 w-4"
-              onClick={() => reload()}
-            >
-              <RefreshCcw className="w-3.5 h-3.5 scale-100 transition-all" />
-            </Button>
-          </ButtonWithTooltip>
-        )}
-      </div>
-    )
-  );
+  const renderActionButtons = () => null;
 
   return (
     <motion.div {...MOTION_CONFIG} className="flex flex-col gap-2 whitespace-pre-wrap">
       <ChatBubble variant={message.role === "user" ? "sent" : "received"}>
         <ChatBubbleAvatar
-          src={message.role === "assistant" ? "/ollama.png" : ""}
+          src=""
           width={6}
           height={6}
           className="object-contain dark:invert"
-          fallback={message.role === "user" ? "US" : ""}
+          fallback={message.role === "user" ? "You" : "👤"}
         />
         <ChatBubbleMessage>
           {renderThinkingProcess()}
