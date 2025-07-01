@@ -20,9 +20,12 @@ import {
 } from "@/components/ui/popover";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import useChatStore from "@/app/hooks/useChatStore";
+import { useExperimentStore } from "@/app/hooks/useExperimentStore";
 import { toast } from "sonner";
 import PullModel from "@/components/pull-model";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { ImageIcon } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const [models, setModels] = useState<string[]>([]);
@@ -32,6 +35,9 @@ export default function AdminSettingsPage() {
   const selectedModel = useChatStore((state) => state.selectedModel);
   const setSelectedModel = useChatStore((state) => state.setSelectedModel);
   const deleteAllChats = useChatStore((state) => state.deleteAllChats);
+  
+  // Experiment store for admin settings
+  const { adminSettings, updateAdminSettings } = useExperimentStore();
 
   useEffect(() => {
     loadModels();
@@ -76,6 +82,11 @@ export default function AdminSettingsPage() {
       deleteAllChats();
       toast.success("All chat data deleted successfully");
     }
+  };
+
+  const handleImageUploadToggle = (enabled: boolean) => {
+    updateAdminSettings({ allowImageUploads: enabled });
+    toast.success(`Image uploads ${enabled ? 'enabled' : 'disabled'} for all participants`);
   };
 
   return (
@@ -196,6 +207,46 @@ export default function AdminSettingsPage() {
                 </Dialog>
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Chat Features */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ImageIcon className="h-5 w-5" />
+            Chat Features
+          </CardTitle>
+          <CardDescription>
+            Control what features are available to participants during conversations
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <div className="text-sm font-medium">Image Uploads</div>
+              <div className="text-xs text-muted-foreground">
+                Allow participants to upload and send images during conversations
+              </div>
+            </div>
+            <Switch
+              checked={adminSettings.allowImageUploads}
+              onCheckedChange={handleImageUploadToggle}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between opacity-50">
+            <div className="space-y-0.5">
+              <div className="text-sm font-medium">Voice Input</div>
+              <div className="text-xs text-muted-foreground">
+                Voice input is automatically enabled based on browser support
+              </div>
+            </div>
+            <Switch
+              checked={typeof window !== 'undefined' && 'webkitSpeechRecognition' in window}
+              disabled={true}
+            />
           </div>
         </CardContent>
       </Card>

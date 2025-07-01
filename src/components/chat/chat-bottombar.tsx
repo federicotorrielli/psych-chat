@@ -17,6 +17,7 @@ import { Mic, SendHorizonal } from "lucide-react";
 import useSpeechToText from "@/app/hooks/useSpeechRecognition";
 import MultiImagePicker from "../image-embedder";
 import useChatStore from "@/app/hooks/useChatStore";
+import { useExperimentStore } from "@/app/hooks/useExperimentStore";
 import Image from "next/image";
 import { ChatRequestOptions, Message } from "ai";
 import { ChatInput } from "../ui/chat/chat-input";
@@ -45,6 +46,12 @@ export default function ChatBottombar({
   const base64Images = useChatStore((state) => state.base64Images);
   const setBase64Images = useChatStore((state) => state.setBase64Images);
   const selectedModel = useChatStore((state) => state.selectedModel);
+  
+  // Admin settings
+  const { adminSettings } = useExperimentStore();
+  
+  // Check browser support for speech recognition
+  const isSpeechSupported = typeof window !== 'undefined' && 'webkitSpeechRecognition' in window;
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
@@ -97,17 +104,22 @@ export default function ChatBottombar({
             {isLoading ? (
               // Loading state
               <div className="flex w-full justify-between">
-                <MultiImagePicker disabled onImagesPick={setBase64Images} />
+                {adminSettings.allowImageUploads && (
+                  <MultiImagePicker disabled onImagesPick={setBase64Images} />
+                )}
+                {!adminSettings.allowImageUploads && <div />}
                 <div>
-                  <Button
-                    className="shrink-0 rounded-full"
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                    disabled
-                  >
-                    <Mic className="w-5 h-5" />
-                  </Button>
+                  {isSpeechSupported && (
+                    <Button
+                      className="shrink-0 rounded-full"
+                      variant="ghost"
+                      size="icon"
+                      type="button"
+                      disabled
+                    >
+                      <Mic className="w-5 h-5" />
+                    </Button>
+                  )}
                   <Button
                     className="shrink-0 rounded-full"
                     variant="ghost"
@@ -125,29 +137,34 @@ export default function ChatBottombar({
             ) : (
               // Default state
               <div className="flex w-full justify-between">
-                <MultiImagePicker
-                  disabled={isLoading}
-                  onImagesPick={setBase64Images}
-                />
+                {adminSettings.allowImageUploads && (
+                  <MultiImagePicker
+                    disabled={isLoading}
+                    onImagesPick={setBase64Images}
+                  />
+                )}
+                {!adminSettings.allowImageUploads && <div />}
                 <div>
                   {/* Microphone button with animation when listening */}
-                  <Button
-                    className={`shrink-0 rounded-full ${
-                      isListening
-                        ? "relative bg-blue-500/30 hover:bg-blue-400/30"
-                        : ""
-                    }`}
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                    onClick={handleListenClick}
-                    disabled={isLoading}
-                  >
-                    <Mic className="w-5 h-5" />
-                    {isListening && (
-                      <span className="animate-pulse absolute h-[120%] w-[120%] rounded-full bg-blue-500/30" />
-                    )}
-                  </Button>
+                  {isSpeechSupported && (
+                    <Button
+                      className={`shrink-0 rounded-full ${
+                        isListening
+                          ? "relative bg-blue-500/30 hover:bg-blue-400/30"
+                          : ""
+                      }`}
+                      variant="ghost"
+                      size="icon"
+                      type="button"
+                      onClick={handleListenClick}
+                      disabled={isLoading}
+                    >
+                      <Mic className="w-5 h-5" />
+                      {isListening && (
+                        <span className="animate-pulse absolute h-[120%] w-[120%] rounded-full bg-blue-500/30" />
+                      )}
+                    </Button>
+                  )}
 
                   {/* Send button */}
                   <Button

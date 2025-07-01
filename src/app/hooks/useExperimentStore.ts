@@ -23,6 +23,11 @@ interface ExperimentState {
   conditions: ExperimentCondition[];
   experiments: ExperimentConfig[];
   
+  // Admin settings
+  adminSettings: {
+    allowImageUploads: boolean;
+  };
+  
   // UI state
   isAdmin: boolean;
   lastSaveTime: number;
@@ -31,6 +36,7 @@ interface ExperimentState {
 interface ExperimentActions {
   // Admin actions
   setIsAdmin: (isAdmin: boolean) => void;
+  updateAdminSettings: (settings: Partial<{ allowImageUploads: boolean }>) => void;
   
   // Persona management
   loadPersonas: () => Promise<void>;
@@ -70,11 +76,17 @@ export const useExperimentStore = create<ExperimentState & ExperimentActions>()(
       personas: [],
       conditions: [],
       experiments: [],
+      adminSettings: {
+        allowImageUploads: true, // Default to true for backward compatibility
+      },
       isAdmin: false,
       lastSaveTime: 0,
 
       // Admin actions
       setIsAdmin: (isAdmin) => set({ isAdmin }),
+      updateAdminSettings: (settings) => set((state) => ({
+        adminSettings: { ...state.adminSettings, ...settings }
+      })),
 
       // Persona management
       loadPersonas: async () => {
@@ -350,6 +362,7 @@ export const useExperimentStore = create<ExperimentState & ExperimentActions>()(
       name: "experiment-store",
       partialize: (state) => ({
         isAdmin: state.isAdmin,
+        adminSettings: state.adminSettings,
         currentExperiment: state.currentExperiment,
         currentParticipant: state.currentParticipant,
         currentSession: state.currentSession,
