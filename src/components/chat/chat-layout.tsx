@@ -31,10 +31,11 @@ export function ChatLayout({
 }: MergedProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
   const [isMobile, setIsMobile] = useState(false);
-  const { currentSession } = useExperimentStore();
+  const { currentSession, currentExperiment, experiments } = useExperimentStore();
   
-  // Hide sidebar during experiment sessions
-  const hideSidebar = !!currentSession;
+  // Hide sidebar during experiment sessions or when experiments are active
+  const activeExperiments = experiments.filter(e => e.isActive);
+  const hideSidebar = !!currentSession || activeExperiments.length > 0;
 
   useEffect(() => {
     const checkScreenWidth = () => {
